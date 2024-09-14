@@ -1,0 +1,11 @@
+.Text {
+    width: 100%;
+    height: 80vh; /* 높이를 뷰포트 높이의 20%로 조정 */
+    background-color: #ddd9d9;
+    position: relative; /* position 속성 추가 */
+     /* z-index 추가 */
+    margin-top: 3vh;
+    opacity: 70%;
+}
+
+

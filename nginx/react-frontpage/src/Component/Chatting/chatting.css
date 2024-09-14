@@ -1,0 +1,33 @@
+.chat-input-container {
+    display: flex;
+    align-items: center;
+    height: 15vh;
+    width: 87.5vw;
+    bottom: 0;
+    background-color: #f1f1f1; /* 배경색 */
+    padding: 5px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.chat-input {
+    flex: 1;
+    height: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+
+.send-button {
+    height: 100%;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    background-color: #0056b3;
+}
