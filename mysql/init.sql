@@ -17,7 +17,7 @@ CREATE TABLE users (
     refresh_token TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY(idx)
+    PRIMARY KEY (idx)
 ) ENGINE=InnoDB CHARSET=utf8mb4;
 
 
@@ -25,34 +25,28 @@ CREATE TABLE users (
 CREATE TABLE characters (
     idx INT AUTO_INCREMENT,
     uuid CHAR(36) UNIQUE NOT NULL,
-    useridx INT, 
+    useridx INT,
     character_name VARCHAR(30) NOT NULL,
     character_setting VARCHAR(255),
     description VARCHAR(255),
     greeting TEXT,
-    accesslevel INT,
+    accesslevel BOOLEAN,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY(idx),
-    FOREIGN KEY (useridx) REFERENCES users(idx)
+    PRIMARY KEY (idx),
+    FOREIGN KEY (useridx) REFERENCES users(idx) ON DELETE CASCADE
 ) ENGINE=InnoDB CHARSET=utf8mb4;
 
-
-
-
--- -- 채팅방
--- CREATE TABLE chatroom (
---     chatroom_pk INT AUTO_INCREMENT,
---     users_idx INT,
---     characters_pk INT,
---     mongo_chatlog VARCHAR(100),
---     created_at DATETIME DEFAULT NOW(),
---     updated_at DATETIME DEFAULT NOW(),
-
-
---     PRIMARY KEY(chatroom_pk),
---     FOREIGN KEY (users_idx) REFERENCES users(id), /*외부키 설정*/
---     FOREIGN KEY (characters_pk) REFERENCES characters(characters_pk) /*외부키 설정*/
--- ) ENGINE=InnoDB CHARSET=utf8mb4;
-
-
+-- 채팅방
+CREATE TABLE chatroom (
+    chatroom_pk INT AUTO_INCREMENT,
+    users_idx INT,
+    characters_pk INT,
+    mongo_chatlog VARCHAR(100),
+    created_at DATETIME DEFAULT NOW(),
+    updated_at DATETIME DEFAULT NOW() ON UPDATE NOW(),
+    
+    PRIMARY KEY(chatroom_pk),
+    FOREIGN KEY (users_idx) REFERENCES users(idx) ON DELETE CASCADE, /*외부키 설정*/
+    FOREIGN KEY (characters_pk) REFERENCES characters(idx) ON DELETE CASCADE /*외부키 설정*/
+) ENGINE=InnoDB CHARSET=utf8mb4;
