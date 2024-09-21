@@ -1,11 +1,33 @@
 .Text {
+    
     width: 100%;
-    height: 80vh; /* 높이를 뷰포트 높이의 20%로 조정 */
-    background-color: #ddd9d9;
+    height: 30vh; /* 높이를 뷰포트 높이의 80%로 조정 */
+    background-color: rgba(221, 217, 217, 0); /* 배경색과 투명도 설정 */
     position: relative; /* position 속성 추가 */
-     /* z-index 추가 */
-    margin-top: 3vh;
-    opacity: 70%;
+    margin-top: 50vh;
+    display: flex; /* Flexbox 사용 */
+    flex-direction: column; /* 세로 방향으로 정렬 */
+    align-items: center; /* 중앙 정렬 */
+    padding: 20px 10px; /* 위쪽 여백을 증가시켜 메시지 시작 위치 아래로 내림 */
+    overflow-y: scroll; /* 수직 스크롤 가능 */
 }
 
+.message {
+    background-color: rgba(255, 255, 255, 0.9); /* 메시지 배경색과 투명도 설정 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 10px; /* 메시지 내부 여백 */
+    margin: 5px 0; /* 메시지 간격 */
+    max-width: 80%; /* 메시지 최대 너비 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+    text-align: center; /* 메시지 텍스트 중앙 정렬 */
+}
 
+.message.user {
+    align-self: flex-end; /* 사용자 메시지 우측 정렬 */
+    margin-right: 25vw; /* 사용자 메시지 오른쪽 여백 */
+}
+
+.message.client {
+    align-self: flex-start; /* 클라이언트 메시지 좌측 정렬 */
+    margin-left: 22vw; /* 클라이언트 메시지 왼쪽 여백 */
+}
