@@ -33,6 +33,4 @@ class TokenAuth(@Value("\${jwt.secret}") private val jwtSecret: String) {
             throw RuntimeException("알 수 없는 오류가 발생했습니다: ${e.message}")
         }
     }
-    
-    
 }

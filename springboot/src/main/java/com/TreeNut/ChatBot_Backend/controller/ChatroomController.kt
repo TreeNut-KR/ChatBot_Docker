@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
 import java.net.URI
+import org.springframework.http.ResponseEntity
 
 @RestController
 @RequestMapping("/server/chatroom")
@@ -79,5 +80,17 @@ class ChatroomController(
             .onErrorResume {
                 ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build()
             }
+    }
+
+    @GetMapping("/token/test")
+    fun testToken(@RequestHeader("Authorization") token: String): ResponseEntity<Map<String, Any>> {
+        val cleanedToken = token.replace("Bearer ", "")
+        val userid = tokenAuth.authGuard(cleanedToken)
+        
+        return if (userid != null) {
+            ResponseEntity.ok(mapOf("status" to 200, "userid" to userid))
+        } else {
+            ResponseEntity.status(401).body(mapOf("status" to 401, "message" to "Invalid token"))
+        }
     }
 }
