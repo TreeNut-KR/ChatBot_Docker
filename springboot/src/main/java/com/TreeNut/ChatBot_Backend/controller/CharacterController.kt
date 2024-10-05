@@ -51,7 +51,7 @@ class CharacterController(
     
         // 캐릭터 객체 생성
         val newCharacter = Character(
-            uuid = UUID.randomUUID().toString(),
+            uuid = UUID.randomUUID().toString().replace("-", ""),
             userid = userid,
             characterName = characterName,
             description = description,
@@ -71,25 +71,28 @@ class CharacterController(
         }
     }
 
+
     @PutMapping("/edit")
     fun editCharacter(
-        @RequestParam characterName: String,
-        @RequestBody updatedCharacter: Character,
-        @RequestHeader("Authorization") userToken: String
+        @RequestParam characterName: String, // 수정하려는 캐릭터 이름을 받음
+        @RequestBody updatedCharacter: Character, // 수정할 캐릭터 정보
+        @RequestHeader("Authorization") userToken: String // JWT 토큰
     ): ResponseEntity<Any> {
         return try {
-            // 현재 캐릭터 찾기
-            val character = characterService.getCharacterByName(characterName).firstOrNull()
-                ?: return ResponseEntity.badRequest().body(mapOf("status" to 404, "message" to "Character not found"))
-                
-            // 사용자 토큰에서 userid 추출
-            val claims = Jwts.parser()
-                .setSigningKey(tokenAuth.getJwtSecret())  // tokenAuth에서 jwtSecret 가져오기
-                .parseClaimsJws(userToken)
-                .body
-            val tokenUserId = claims["userId"] as String? ?: return ResponseEntity.badRequest().body(mapOf("status" to 400, "message" to "User ID is required"))
+            // 1. JWT 토큰에서 사용자 ID 추출
+            val tokenUserId = tokenAuth.authGuard(userToken)
+                ?: return ResponseEntity.badRequest().body(mapOf("status" to 400, "message" to "유효한 사용자 ID가 필요합니다."))
 
-            // 캐릭터를 업데이트하기 위한 객체 생성
+            // 2. 기존 캐릭터 찾기 (캐릭터 이름으로)
+            val character = characterService.getCharacterByName(characterName).firstOrNull()
+                ?: return ResponseEntity.badRequest().body(mapOf("status" to 404, "message" to "캐릭터를 찾을 수 없습니다."))
+
+            // 3. 권한 확인: 캐릭터의 소유자가 맞는지 검증
+            if (character.userid != tokenUserId) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(mapOf("status" to 403, "message" to "이 캐릭터를 수정할 권한이 없습니다."))
+            }
+
+            // 4. 업데이트할 캐릭터 정보 생성
             val editedCharacterEntity = character.copy(
                 characterName = updatedCharacter.characterName ?: character.characterName,
                 description = updatedCharacter.description ?: character.description,
@@ -97,15 +100,16 @@ class CharacterController(
                 image = updatedCharacter.image ?: character.image,
                 characterSetting = updatedCharacter.characterSetting ?: character.characterSetting,
                 accessLevel = updatedCharacter.accessLevel ?: character.accessLevel,
-                userid = tokenUserId // 직접 가져온 userid로 설정
+                updatedAt = LocalDateTime.now() // 수정 시간 업데이트
             )
 
-            // 업데이트 수행
+            // 5. 캐릭터 수정 처리
             characterService.editCharacter(characterName, editedCharacterEntity, userToken)
 
-            ResponseEntity.ok(mapOf("status" to 200, "message" to "Character updated successfully"))
+            // 6. 응답 반환
+            ResponseEntity.ok(mapOf("status" to 200, "message" to "캐릭터가 성공적으로 수정되었습니다."))
         } catch (e: Exception) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf("status" to 401, "message" to "Authorization error: ${e.message}"))
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf("status" to 500, "message" to "캐릭터 수정 중 오류 발생: ${e.message}"))
         }
     }
 }

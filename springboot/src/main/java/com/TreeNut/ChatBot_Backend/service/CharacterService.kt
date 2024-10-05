@@ -18,7 +18,7 @@ class CharacterService(
     fun addCharacter(character: Character): Character {
         return try {
             val newCharacter = character.copy(
-                uuid = UUID.randomUUID().toString(),
+                uuid = UUID.randomUUID().toString().replace("-", ""),
                 userid = character.userid,
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
