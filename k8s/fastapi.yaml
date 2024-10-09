@@ -1,0 +1,34 @@
+# fastapi.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      imagePullSecrets:
+      - name: treenut
+      containers:
+      - name: fastapi
+        image: jgkim14/chatbot-fastapi:latest
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+          - name: sources
+            mountPath: /app/sources
+          - name: logs
+            mountPath: /app/sources/logs
+      volumes:
+      - name: sources
+        persistentVolumeClaim:
+          claimName: fastapi-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: fastapi-pvc

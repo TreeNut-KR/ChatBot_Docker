@@ -5,16 +5,18 @@ services:
     restart: always
     build:
       context: ./nginx
+    image: jgkim14/chatbot-nginx:latest  # Docker Hub에 푸시할 이미지 이름
     ports:
       - "80:80"
     depends_on:
       - fastapi
-      - springboot  # Spring Boot 서비스 추가
+      - springboot
 
   fastapi:
     restart: always
     build:
       context: ./fastapi
+    image: jgkim14/chatbot-fastapi:latest  # Docker Hub에 푸시할 이미지 이름
     ports:
       - "8000:8000"
     volumes:
@@ -23,27 +25,40 @@ services:
     depends_on:
       - mysql
       - mongodb
+      - pytorch
     command: [
       "/usr/local/bin/wait-for-it",
       "mysql:3306", "--",
       "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"
       ]
+  
+  pytorch:
+    restart: always
+    build:
+      context: ./pytorch
+    image: jgkim14/chatbot-pytorch:latest
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    volumes:
+      - ./pytorch/model:/app
 
   springboot:
     restart: always
     build:
       context: ./springboot
-      dockerfile: Dockerfile
+    image: jgkim14/chatbot-springboot:latest  # Docker Hub에 푸시할 이미지 이름
     ports:
       - "8080:8080"
-    command: ["./gradlew build -x test --no-daemon"] # 테스트를 건너뛰고 빌드
+    command: ["./gradlew build -x test --no-daemon"]
     depends_on:
-      - mysql  # MySQL 서비스에 의존
+      - mysql
 
   mysql:
     restart: unless-stopped
     build:
       context: ./mysql
+    image: jgkim14/chatbot-mysql:latest  # Docker Hub에 푸시할 이미지 이름
     ports:
       - "3308:3306"
     environment:
@@ -63,6 +78,7 @@ services:
     restart: unless-stopped
     build:
       context: ./mongo
+    image: jgkim14/chatbot-mongodb:latest  # Docker Hub에 푸시할 이미지 이름
     ports:
       - "27017:27017"
     environment:

@@ -8,6 +8,7 @@ COPY build.gradle.kts .
 COPY gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.jar
 COPY gradle/wrapper/gradle-wrapper.properties gradle/wrapper/gradle-wrapper.properties
 COPY src ./src
+RUN chmod +x gradlew
 
 RUN ./gradlew build -x test --no-daemon
 
@@ -20,6 +21,8 @@ RUN apt-get update && apt-get install -y netcat
 COPY wait-for-it.sh /wait-for-it
 RUN sed -i 's/\r$//' /wait-for-it && chmod +x /wait-for-it
 
+# JAR 파일을 /app.jar로 복사
 COPY --from=build /app/build/libs/*.jar /app.jar
 
-ENTRYPOINT ["./wait-for-it", "mysql:3306", "--", "java", "-jar", "/app.jar"]
+# ENTRYPOINT에서 절대 경로 사용
+ENTRYPOINT ["/wait-for-it", "mysql:3306", "--", "java", "-jar", "/app.jar"]

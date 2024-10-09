@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot
+  template:
+    metadata:
+      labels:
+        app: springboot
+    spec:
+      imagePullSecrets:
+      - name: treenut
+      containers:
+      - name: springboot
+        image: jgkim14/chatbot-springboot:latest
+        ports:
+        - containerPort: 8080
+        command: ["./gradlew", "build", "-x", "test", "--no-daemon"]
+---
+apiVersion: v1
+kind

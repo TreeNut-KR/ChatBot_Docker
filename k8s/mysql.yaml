@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      imagePullSecrets:
+      - name: treenut
+      containers:
+      - name: mysql
+        image: jgkim14/chatbot-mysql:latest
+        ports:
+        - containerPort: 3306
+        env:
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: MYSQL_DATABASE
+          - name: MYSQL_ROOT_HOST
+            value: "mysql"
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: MYSQL_ROOT_PASSWORD
+        volumeMounts:
+          - name: mysql-data
+            mountPath: /var/lib/mysql
+          - name: mysql-log-cnf
+            mountPath: /etc/mysql/conf.d/log.cnf
+            subPath: log.cnf
+          - name: mysql-logs
+            mountPath: /var/log/mysql
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      - name: mysql-log-cnf
+        persistentVolumeClaim:
+          claimName: mysql-pvc
+      - name: mysql-logs
+        persistentVolumeClaim:
+          claimName: mysql-pvc

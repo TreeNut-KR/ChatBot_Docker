@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      imagePullSecrets:
+      - name: treenut
+      containers:
+      - name: mongodb
+        image: jgkim14/chatbot-mongodb:latest
+        ports:
+        - containerPort: 27017
+        env:
+          - name: MONGO_INITDB_ROOT_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_INITDB_ROOT_USERNAME
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_INITDB_ROOT_PASSWORD
+          - name: MONGO_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: MONGO_DATABASE
+        volumeMounts:
+          - name: mongo-data
+            mountPath: /data/db
+          - name: mongo-log
+            mountPath: /var/log/mongodb
+          - name: mongo-env
+            mountPath: /docker-entrypoint-initdb.d/.env
+      volumes:
+      - name: mongo-data
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+      - name: mongo-log
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+      - name: mongo-env
+        persistentVolumeClaim:
+          claimName: mongodb-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  type: NodePort
+  ports:
+    - port: 27017
+      targetPort: 27017
+      nodePort: 30084
+  selector:
+    app: mongodb

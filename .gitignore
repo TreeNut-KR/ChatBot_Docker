@@ -50,7 +50,7 @@ eggs/
 .eggs/
 lib/
 lib64/
-parts/
+parts/ 
 sdist/
 var/
 wheels/
@@ -199,6 +199,8 @@ springboot/build/
 !springboot/gradle/wrapper/gradle-wrapper.jar
 !springboot/**/src/main/**/build/
 !springboot/**/src/test/**/build/
+
+k8s/secret.yaml
 
 ### STS ###
 springboot/.apt_generated
